@@ -1,5 +1,6 @@
 namespace SpriteKind {
     export const Cursor = SpriteKind.create()
+    export const highlight = SpriteKind.create()
 }
 function createPiece (kind: string, black: boolean, image2: Image) {
     tempSprite = sprites.create(image2, SpriteKind.Player)
@@ -202,7 +203,7 @@ function can_i_move_here (asker: Sprite, col: number, row: number) {
     for (let value of sprites.allOfKind(SpriteKind.Player)) {
         if (value.tilemapLocation().column == col && value.tilemapLocation().row == row) {
             if (sprites.readDataBoolean(value, "black") == sprites.readDataBoolean(asker, "black")) {
-                return true
+                return false
             }
             break;
         }
@@ -215,10 +216,18 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Player, function (sprite, otherS
     }
 })
 function highlight_move_spots (piece: Sprite) {
+    sprites.destroyAllSpritesOfKind(SpriteKind.highlight)
     if (sprites.readDataString(piece, "kind") == "pawn") {
     	
     } else if (sprites.readDataString(piece, "kind") == "knight") {
-    	
+        possiblyHightlight(piece, piece.tilemapLocation().column + 1, piece.tilemapLocation().row + 2)
+        possiblyHightlight(piece, piece.tilemapLocation().column - 1, piece.tilemapLocation().row + 2)
+        possiblyHightlight(piece, piece.tilemapLocation().column - 1, piece.tilemapLocation().row - 2)
+        possiblyHightlight(piece, piece.tilemapLocation().column + 1, piece.tilemapLocation().row - 2)
+        possiblyHightlight(piece, piece.tilemapLocation().column + 2, piece.tilemapLocation().row - 1)
+        possiblyHightlight(piece, piece.tilemapLocation().column + 2, piece.tilemapLocation().row + 1)
+        possiblyHightlight(piece, piece.tilemapLocation().column - 2, piece.tilemapLocation().row + 1)
+        possiblyHightlight(piece, piece.tilemapLocation().column - 2, piece.tilemapLocation().row - 1)
     } else if (sprites.readDataString(piece, "kind") == "rook") {
     	
     } else if (sprites.readDataString(piece, "kind") == "bishop") {
@@ -228,6 +237,22 @@ function highlight_move_spots (piece: Sprite) {
     } else if (sprites.readDataString(piece, "kind") == "bishop") {
     	
     }
+}
+function possiblyHightlight (sprite: Sprite, col: number, row: number) {
+    if (can_i_move_here(sprite, col, row)) {
+    	
+    }
+    tempSprite = sprites.create(img`
+        5 5 5 5 5 5 5 5 
+        5 . . . . . . 5 
+        5 . . . . . . 5 
+        5 . . . . . . 5 
+        5 . . . . . . 5 
+        5 . . . . . . 5 
+        5 . . . . . . 5 
+        5 5 5 5 5 5 5 5 
+        `, SpriteKind.highlight)
+    tiles.placeOnTile(tempSprite, tiles.getTileLocation(col, row))
 }
 let tempSprite: Sprite = null
 tiles.loadMap(tiles.createSmallMap(tilemap`level2`))
